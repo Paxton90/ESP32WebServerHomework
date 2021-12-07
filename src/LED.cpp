@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-int LEDPin[] = {16, 17, 18, 19};
+int LEDPin[] = {25,17,16,27};
 
 bool LEDState[] = {0, 0, 0, 0};
 
