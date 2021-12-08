@@ -1,5 +1,4 @@
 #include <ESP32Servo.h>
-#include "Buzzer.h"
 
 int buzzer = 26;
 bool buzzerState = false;
@@ -9,7 +8,6 @@ TaskHandle_t AlarmTask;
 // function for task
 void buzzerAlarm(void *parameter)
 {
-    buzzerState = true;
     for (;;)
     {
         tone(buzzer, 1000, 250);
@@ -19,15 +17,17 @@ void buzzerAlarm(void *parameter)
     }
 }
 
-// create task to run in core 0, default loop by arduino is core 1
+// create task to run in free core
 void buzzerAlarmOn()
 {
-    xTaskCreatePinnedToCore(buzzerAlarm, "AlarmTask", 1000, NULL, 0, &AlarmTask, 0);
+    buzzerState = true;
+    xTaskCreate(buzzerAlarm, "AlarmTask", 1000, NULL, 0, &AlarmTask);
 }
-// delete task to stop
+// delete task and stop buzzer
 void buzzerAlarmOff()
 {
     vTaskDelete(AlarmTask);
+    tone(buzzer, 0, 0);
     buzzerState = false;
 }
 

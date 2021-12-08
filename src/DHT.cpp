@@ -1,38 +1,67 @@
 #include <Arduino.h>
 #include <SimpleDHT.h>
-
-int pinDHT11 = 4;
+#define DHTPower 14
+#define pinDHT11 4
 
 SimpleDHT11 dht11(pinDHT11);
 
+bool DHTState = false;
 byte temp = 0;
 byte humid = 0;
 
-// update data from DHT
-void updateDHT()
+void DHTInit()
+{
+    pinMode(DHTPower, OUTPUT);
+}
+
+void DHTOff();
+
+TaskHandle_t DHTTask;
+// create a function for task and update data from DHT
+void updateData(void *parameter)
 {
     byte temperature = 0;
     byte humidity = 0;
-    int err = SimpleDHTErrSuccess;
-    if ((err = dht11.read(&temperature, &humidity, NULL)) != SimpleDHTErrSuccess)
+    for (;;)
     {
-        Serial.print("Read DHT11 failed, err=");
-        Serial.println(err);
-        delay(1000);
-        return;
+        vTaskDelay(1500 / portTICK_PERIOD_MS);
+        int err = SimpleDHTErrSuccess;
+        if ((err = dht11.read(&temperature, &humidity, NULL)) != SimpleDHTErrSuccess)
+        {
+            // Serial.print("Read DHT11 failed, err=");
+            // Serial.println(err);
+            continue;
+        }
+        temp = temperature;
+        humid = humidity;
     }
-    temp = temperature;
-    humid = humid;
-    //Serial.print((int)temperature); Serial.print(" *C, ");
-    //Serial.print((int)humidity); Serial.println(" H");
 }
 
-int getTemperature()
+void DHTOn()
 {
-    return temp;
+    digitalWrite(DHTPower, HIGH);
+    DHTState = true;
+    xTaskCreate(updateData, "DHTTask", 1000, NULL, 2, &DHTTask);
 }
 
-int getHumidity()
+void DHTOff()
 {
-    return humid;
+    vTaskDelete(DHTTask);
+    digitalWrite(DHTPower, LOW);
+    DHTState = false;
+}
+
+bool getDHTState()
+{
+    return DHTState;
+}
+
+String getTemperature()
+{
+    return (DHTState) ? (String)temp : "off";
+}
+
+String getHumidity()
+{
+    return (DHTState) ? (String)humid : "off";
 }

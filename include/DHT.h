@@ -1,3 +1,6 @@
-void updateDHT();
-int getTemperature();
-int getHumidity();
+void DHTInit();
+void DHTOn();
+void DHTOff();
+bool getDHTState();
+String getTemperature();
+String getHumidity();
