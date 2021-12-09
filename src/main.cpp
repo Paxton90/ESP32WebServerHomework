@@ -99,7 +99,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     }
 
     .slider.round:before {
-      border-radius: 50%%;
+      border-radius: 50%;
     }
   </style>
 </head>
@@ -178,19 +178,6 @@ const char index_html[] PROGMEM = R"rawliteral(
 
 </html>)rawliteral";
 
-String processor(const String &var)
-{
-  if (var == "TEMPERATURE")
-  {
-    return getTemperature();
-  }
-  else if (var == "HUMIDITY")
-  {
-    return getHumidity();
-  }
-  return String();
-}
-
 // value
 // 0~3 LED
 // 4 DHT
@@ -220,7 +207,7 @@ void setup()
   Serial.println(WiFi.localIP());
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send_P(200, "text/html", index_html, processor); });
+            { request->send_P(200, "text/html", index_html); });
   server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send_P(200, "text/plain", getTemperature().c_str()); });
   server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request)
