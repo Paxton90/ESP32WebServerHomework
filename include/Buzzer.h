@@ -1,3 +1,3 @@
-void buzzerAlarmOn();
-void buzzerAlarmOff();
+void buzzerAlarmON();
+void buzzerAlarmOFF();
 bool getBuzzerState();

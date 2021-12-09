@@ -18,17 +18,23 @@ void buzzerAlarm(void *parameter)
 }
 
 // create task to run in free core
-void buzzerAlarmOn()
+void buzzerAlarmON()
 {
-    buzzerState = true;
-    xTaskCreate(buzzerAlarm, "AlarmTask", 1000, NULL, 0, &AlarmTask);
+    if (!buzzerState)
+    {
+        buzzerState = true;
+        xTaskCreate(buzzerAlarm, "AlarmTask", 1000, NULL, 0, &AlarmTask);
+    }
 }
 // delete task and stop buzzer
-void buzzerAlarmOff()
+void buzzerAlarmOFF()
 {
-    vTaskDelete(AlarmTask);
-    tone(buzzer, 0, 0);
-    buzzerState = false;
+    if (buzzerState)
+    {
+        vTaskDelete(AlarmTask);
+        tone(buzzer, 0, 0);
+        buzzerState = false;
+    }
 }
 
 bool getBuzzerState()

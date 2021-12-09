@@ -37,18 +37,24 @@ void updateData(void *parameter)
     }
 }
 
-void DHTOn()
+void DHTON()
 {
-    digitalWrite(DHTPower, HIGH);
-    DHTState = true;
-    xTaskCreate(updateData, "DHTTask", 1000, NULL, 2, &DHTTask);
+    if (!DHTState)
+    {
+        digitalWrite(DHTPower, HIGH);
+        DHTState = true;
+        xTaskCreate(updateData, "DHTTask", 1000, NULL, 2, &DHTTask);
+    }
 }
 
-void DHTOff()
+void DHTOFF()
 {
-    vTaskDelete(DHTTask);
-    digitalWrite(DHTPower, LOW);
-    DHTState = false;
+    if (DHTState)
+    {
+        vTaskDelete(DHTTask);
+        digitalWrite(DHTPower, LOW);
+        DHTState = false;
+    }
 }
 
 bool getDHTState()
